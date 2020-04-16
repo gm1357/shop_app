@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/product.dart';
+import '../providers/products.dart';
 
 class EditProductScreen extends StatefulWidget {
   static const routeName = '/edit-product';
@@ -23,11 +25,36 @@ class _EditProductScreenState extends State<EditProductScreen> {
     price: 0,
     isFavorite: false,
   );
+  var _initValues = {
+    'title': '',
+    'description': '',
+    'price': '',
+  };
+  var _isInit = true;
 
   @override
   void initState() {
     _imageFocusNode.addListener(_updateImageUrl);
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      final productId = ModalRoute.of(context).settings.arguments as String;
+      if (productId != null) {
+        _editedProduct = Provider.of<Products>(context).findById(productId);
+        _initValues = {
+          'title': _editedProduct.title,
+          'description': _editedProduct.description,
+          'price': _editedProduct.price.toString(),
+        };
+        _imageUrlController.text = _editedProduct.imageUrl;
+      }
+    }
+    _isInit = false;
+
+    super.didChangeDependencies();
   }
 
   @override
@@ -42,10 +69,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   void _updateImageUrl() {
     if (!_imageFocusNode.hasFocus &&
-      _imageUrlController.text.startsWith('http') &&
-      (_imageUrlController.text.endsWith('.png') || 
-        _imageUrlController.text.endsWith('.jpg') ||
-        _imageUrlController.text.endsWith('.jpeg'))) {
+        _imageUrlController.text.startsWith('http') &&
+        (_imageUrlController.text.endsWith('.png') ||
+            _imageUrlController.text.endsWith('.jpg') ||
+            _imageUrlController.text.endsWith('.jpeg'))) {
       setState(() {});
     }
   }
@@ -56,17 +83,25 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
 
     _form.currentState.save();
-    print(_editedProduct.title);
-    print(_editedProduct.description);
-    print(_editedProduct.price);
-    print(_editedProduct.imageUrl);
+    if (_editedProduct.id != null) {
+      Provider.of<Products>(context, listen: false).updateProduct(
+        _editedProduct.id,
+        _editedProduct,
+      );
+    } else {
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    }
+
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit product'),
+        title: Text(
+          '${_editedProduct.id != null ? 'Edit' : 'Add new'} product',
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.save),
@@ -82,6 +117,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             children: <Widget>[
               TextFormField(
                 decoration: InputDecoration(labelText: 'Title'),
+                initialValue: _initValues['title'],
                 textInputAction: TextInputAction.next,
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(_priceFocusNode);
@@ -99,11 +135,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     id: _editedProduct.id,
                     imageUrl: _editedProduct.imageUrl,
                     price: _editedProduct.price,
+                    isFavorite: _editedProduct.isFavorite,
                   );
                 },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Price'),
+                initialValue: _initValues['price'],
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.number,
                 focusNode: _priceFocusNode,
@@ -129,11 +167,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     id: _editedProduct.id,
                     imageUrl: _editedProduct.imageUrl,
                     price: double.parse(value),
+                    isFavorite: _editedProduct.isFavorite,
                   );
                 },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Description'),
+                initialValue: _initValues['description'],
                 maxLines: 3,
                 keyboardType: TextInputType.multiline,
                 focusNode: _descriptionFocusNode,
@@ -150,6 +190,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     id: _editedProduct.id,
                     imageUrl: _editedProduct.imageUrl,
                     price: _editedProduct.price,
+                    isFavorite: _editedProduct.isFavorite,
                   );
                 },
               ),
@@ -178,6 +219,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   Expanded(
                     child: TextFormField(
                       decoration: InputDecoration(labelText: 'Image URL'),
+                      initialValue: _initValues['imageURL'],
                       keyboardType: TextInputType.url,
                       textInputAction: TextInputAction.done,
                       controller: _imageUrlController,
@@ -190,7 +232,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         if (!value.startsWith('http')) {
                           return 'Please enter a valid URL.';
                         }
-                        if (!value.endsWith('.png') && !value.endsWith('.jpg') && !value.endsWith('.jpeg')) {
+                        if (!value.endsWith('.png') &&
+                            !value.endsWith('.jpg') &&
+                            !value.endsWith('.jpeg')) {
                           return 'Please enter a valid image URL.';
                         }
                         return null;
@@ -202,6 +246,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           id: _editedProduct.id,
                           imageUrl: value,
                           price: _editedProduct.price,
+                          isFavorite: _editedProduct.isFavorite,
                         );
                       },
                     ),
