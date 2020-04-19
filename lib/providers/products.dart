@@ -49,19 +49,21 @@ class Products with ChangeNotifier {
     return _items.where((prod) => prod.isFavorite).toList();
   }
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     const url = 'https://flutter-shop-cd2f2.firebaseio.com/products.json';
 
-    return http.post(
-      url,
-      body: json.encode({
-        'title': product.title,
-        'description': product.description,
-        'imageUrl': product.imageUrl,
-        'price': product.price,
-        'isFavorite': false,
-      }),
-    ).then((response) {
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price,
+          'isFavorite': false,
+        }),
+      );
+
       final newProduct = Product(
         title: product.title,
         description: product.description,
@@ -73,10 +75,11 @@ class Products with ChangeNotifier {
 
       _items.add(newProduct);
       notifyListeners();
-    }).catchError((err) {
+      
+    } catch (err) {
       print(err);
       throw err;
-    });
+    }
   }
 
   Product findById(String id) {
