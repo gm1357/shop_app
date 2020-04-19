@@ -73,6 +73,9 @@ class Products with ChangeNotifier {
 
       _items.add(newProduct);
       notifyListeners();
+    }).catchError((err) {
+      print(err);
+      throw err;
     });
   }
 
