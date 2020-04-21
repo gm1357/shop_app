@@ -78,7 +78,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveForm() {
+  void _saveForm() async {
     if (!_form.currentState.validate()) {
       return;
     }
@@ -90,19 +90,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
     });
 
     if (_editedProduct.id != null) {
-      Provider.of<Products>(context, listen: false).updateProduct(
+      await Provider.of<Products>(context, listen: false).updateProduct(
         _editedProduct.id,
         _editedProduct,
       );
-      Navigator.of(context).pop();
-
-      setState(() {
-        isLoading = false;
-      });
     } else {
-      Provider.of<Products>(context, listen: false)
-          .addProduct(_editedProduct)
-          .catchError((err) {
+      try {
+        await Provider.of<Products>(context, listen: false)
+            .addProduct(_editedProduct);
+      } catch(err) {
         return showDialog<Null>(
             context: context,
             builder: (ctx) => AlertDialog(
@@ -115,14 +111,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     )
                   ],
                 ));
-      }).then((_) {
-        Navigator.of(context).pop();
-
-        setState(() {
-          isLoading = false;
-        });
-      });
+      }
     }
+    setState(() {
+      isLoading = false;
+    });
+
+    Navigator.of(context).pop();
   }
 
   @override
