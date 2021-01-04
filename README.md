@@ -1,16 +1,30 @@
 # shop_app
 
-A new Flutter project.
+A custom shop app made with Flutter where the clients list and sell their own products.
 
-## Getting Started
+<img title="" src="screenshots/login.jpg" hspace="20"/>
 
-This project is a starting point for a Flutter application.
+<img title="" src="screenshots/products.jpg" hspace="20"/>
 
-A few resources to get you started if this is your first Flutter project:
+<img title="" src="screenshots/detail.jpg" hspace="20"/>
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<img title="" src="screenshots/cart.jpg" hspace="20"/>
+<table>
+    <tr>
+        <td>Login page</td>
+        <td>Products page</td>
+    </tr>
+    <tr>
+        <td>Product details page</td>
+        <td>Cart page</td>
+    </tr>
+    </tr>
+    <tr>
+        <td><img src="screenshots/login.jpg" width=270 height=480></td>
+        <td><img src="screenshots/products.jpg" width=270 height=480></td>
+    </tr>
+    <tr>
+        <td><img src="screenshots/detail.jpg" width=270 height=480></td>
+        <td><img src="screenshots/cart.jpg" width=270 height=480></td>
+    </tr>
+ </table>
